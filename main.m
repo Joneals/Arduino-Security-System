@@ -1,32 +1,41 @@
-clear
-% The value of the PWM duty cycle must be specified as a number between 0 and 1.
+% Arduino Security System
+% Created by 
+% Hayden Sutton - hsutton5
+% Jacob Reynolds - jreyno51
+% Matt Trotsky - mtrotsky
+% Purpose : Detect any motion in a room due to intruders, sound an alarm
+% when motion is detected.
+% INPUTS : Push button, Motion Sensor
+% OUTPUTS : LED, Speaker
+% USAGE : Place motion sensor in location where it has view of the room.
+% Push the button once to arm the device.
+function main()
+clear all, close all, clc
+
 a = arduino('COM3', 'uno');
-configureDigitalPin(a, 8, 'pullup');%in future releases use configurePin
-configureDigitalPin(a, 7, 'pullup');
+
 pause(3);
 
+% Define pin constants
 pinLED = 11;
 pinSpeaker = 10;
 pinButton = 7;
 pinMotion = 8;
 
+configureDigitalPin(a, pinButton, 'pullup'); % Both devices are active when pulled low
+configureDigitalPin(a, pinMotion, 'pullup');
+
 state = 'unarmed';
-bButton = 0;
+bButton = false;
 bLED = false;
+bArmed = false;
 
 
 while 1
     bButtonLast = bButton;
-    bButton = (~readDigitalPin(a,pinButton));  % Reads the state of the button, 1 - off, 0 - pressed
-    if bButton && ~bButtonLast  % DO button logic
-        switch state
-            case 'unarmed'
-                state = 'armed';
-            case 'armed'
-                state = 'unarmed';
-                writeDigitalPin(pinLED, 0)
-                
-        end
+    bButton = (~readDigitalPin(a,pinButton));  % Reads the state of the button, 0 - off, 1 - pressed.  Inverted becuase of pullup
+    if bButton && ~bButtonLast  % Ignore button holds, only activate on falling edge
+        bArmed = ~bArmed; % Toggle state
     end
     
     % Flash LED
@@ -38,4 +47,5 @@ while 1
     
     pause(.1)
     disp(state);
+end
 end
