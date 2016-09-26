@@ -1,5 +1,5 @@
 % Arduino Security System
-% Created by 
+% Created by :
 % Hayden Sutton - hsutton5
 % Jacob Reynolds - jreyno51
 % Matt Trotsky - mtrotsky
@@ -9,12 +9,12 @@
 % OUTPUTS : LED, Speaker
 % USAGE : Place motion sensor in location where it has view of the room.
 % Push the button once to arm the device.
-function main()
+
 clear all, close all, clc
 
 a = arduino('COM3', 'uno');
 
-pause(3);
+pause(.5);
 
 % Define pin constants
 pinLED = 'D11';
@@ -22,29 +22,60 @@ pinSpeaker = 'D10';
 pinButton = 'D7';
 pinMotion = 'D8';
 
+threshold = 0.8;  % Value between 0 and 1, tweak for more or less sensitive detection
+loopDelay = 0.01;
+
 configurePin(a, pinButton, 'pullup'); % Both devices are active when pulled low
 configurePin(a, pinMotion, 'pullup');
 
 bButton = false;
 bLED = false;
 bArmed = false;
+bTripped = false;
 
+buffer = zeros(20);
+lastTime = 0;
 
 while 1
-    bButtonLast = bButton;
+    
+    bButtonLast = bButton; % Store the previous state of the button to prevent rapid firing
     bButton = (~readDigitalPin(a,pinButton));  % Reads the state of the button, 0 - off, 1 - pressed.  Inverted becuase of pullup
-    if bButton && ~bButtonLast  % Ignore button holds, only activate on falling edge
+    if bButton && ~bButtonLast  % Ignore button holds, only activate on rising edge
         bArmed = ~bArmed; % Toggle state
+        writeDigitalPin(a, pinLED, bArmed); % Turn off the led when unarmed
     end
     
     % Flash LED
-    if bArmed
-        bLED = ~bLED;
-       writeDigitalPin(a, pinLED, bLED)
+    if (bArmed && ~bTripped)
+       if (cputime - lastTime) > 2 % If time elapsed is more than 2 seconds
+          bLED = ~bLED;
+          lastTime = cputime;
+       end
+    end
+    
+    % Detect motion and set tripped state while armed
+    if (bArmed)
+        motion = ~readDigitalPin(a, pinMotion);
+        buffer = [motion buffer(1,1:end-1)];  % Fill a circular buffer to compute the rolling average
+        avgMotion = mean(buffer);
+        if (avgMotion > threshold) %If the average motion is over the threshold, SOUND THE ALARMS
+            bTripped = 1;
+        end
+    else
+        bTripped = 0;
+    end
+  
+    % If the alarm is tripped, be annoying as possible
+    if (bTripped)
+       playTone(a, pinSpeaker, 2000, .02) 
+       if (cputime - lastTime) > .2
+          bLED = ~bLED; 
+       end
     end
     
     
-    pause(.1)
-    disp(state);
-end
+    writeDigitalPin(a, pinLED, bLED) %update the led
+    
+    pause(loopDelay)
+    disp(bTripped);
 end
