@@ -17,15 +17,14 @@ a = arduino('COM3', 'uno');
 pause(3);
 
 % Define pin constants
-pinLED = 11;
-pinSpeaker = 10;
-pinButton = 7;
-pinMotion = 8;
+pinLED = 'D11';
+pinSpeaker = 'D10';
+pinButton = 'D7';
+pinMotion = 'D8';
 
-configureDigitalPin(a, pinButton, 'pullup'); % Both devices are active when pulled low
-configureDigitalPin(a, pinMotion, 'pullup');
+configurePin(a, pinButton, 'pullup'); % Both devices are active when pulled low
+configurePin(a, pinMotion, 'pullup');
 
-state = 'unarmed';
 bButton = false;
 bLED = false;
 bArmed = false;
@@ -41,7 +40,7 @@ while 1
     % Flash LED
     if strcmp(state,'armed')
         bLED = ~bLED;
-       writeDigitalPin(pinLED, bLED)
+       writeDigitalPin(a, pinLED, bLED)
     end
     
     
