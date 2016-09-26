@@ -38,7 +38,7 @@ while 1
     end
     
     % Flash LED
-    if strcmp(state,'armed')
+    if bArmed
         bLED = ~bLED;
        writeDigitalPin(a, pinLED, bLED)
     end
