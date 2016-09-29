@@ -89,3 +89,5 @@ while 1
     pause(loopDelay)
     %disp(avgMotion);
 end
+
+
