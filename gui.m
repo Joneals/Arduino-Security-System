@@ -1,3 +1,15 @@
+% Arduino Security System
+% Created by :
+% Hayden Sutton - hsutton5
+% Jacob Reynolds - jreyno51
+% Matt Trotsky - mtrotsky
+% Purpose : Detect any motion in a room due to intruders, sound an alarm
+% when motion is detected.
+% INPUTS : Push button, Motion Sensor
+% OUTPUTS : LED, Speaker
+% USAGE : Place motion sensor in location where it has view of the room.
+% Push the button once to arm the device.
+
 function varargout = gui(varargin)
 % GUI MATLAB code for gui.fig
 %      GUI, by itself, creates a new GUI or raises the existing
