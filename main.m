@@ -14,7 +14,7 @@ clear all, close all, clc
 
 a = arduino('COM3', 'uno');
 h = figure(gui);
-bWebControl = true;
+bWebControl = true; % Not implemented
 
 pause(.5);
 
@@ -26,6 +26,8 @@ pinMotion = 'D8';
 
 threshold = 0.3;  % Value between 0 and 1, tweak for more or less sensitive detection
 loopDelay = 0.01;
+global frequency;
+frequency = 2000;
 
 configurePin(a, pinButton, 'pullup'); % Both devices are active when pulled low
 configurePin(a, pinMotion, 'pullup');
@@ -48,11 +50,11 @@ while 1
         bArmed = ~bArmed; % Toggle state
         bLED = 0; % Turn off the led when unarmed
         if(bArmed)
-            h.Children(2).String = 'Armed';
+            h.Children(2).String = 'Armed';  % Handle to button text, needs updating when physical button is pressed
         else
             h.Children(2).String = 'Disarmed';
         end
-        h.Children(2).Value = bArmed;
+        h.Children(2).Value = bArmed;  % Also update the toggle state
     end
     
     % Flash LED
@@ -74,19 +76,20 @@ while 1
         end
     else
         bTripped = 0;
+        bLED = 0;
     end
   
     % If the alarm is tripped, be annoying as possible
     if (bTripped)
-       playTone(a, pinSpeaker, 2000, .02) 
-       if (cputime - lastTime) > .2
+       playTone(a, pinSpeaker, frequency, .02) % 2000 Hz is the most annoying frequency possible
+       if (cputime - lastTime) > .2 % Flash every .2 seconds
           bLED = ~bLED; 
        end
     end
     
     
     if (bWebControl) % Handle web access
-        
+        % Not implemented
     end
     
     
