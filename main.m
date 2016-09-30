@@ -14,6 +14,7 @@ clear all, close all, clc
 
 a = arduino('COM3', 'uno');
 h = figure(gui);
+bWebControl = true;
 
 pause(.5);
 
@@ -84,10 +85,17 @@ while 1
     end
     
     
+    if (bWebControl) % Handle web access
+        
+    end
+    
+    
     writeDigitalPin(a, pinLED, bLED) %update the led
     
     pause(loopDelay)
     %disp(avgMotion);
+    
+   
 end
 
 
