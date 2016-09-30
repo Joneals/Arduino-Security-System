@@ -50,11 +50,11 @@ while 1
         bArmed = ~bArmed; % Toggle state
         bLED = 0; % Turn off the led when unarmed
         if(bArmed)
-            h.Children(2).String = 'Armed';  % Handle to button text, needs updating when physical button is pressed
+            h.Children(4).String = 'Armed';  % Handle to button text, needs updating when physical button is pressed
         else
-            h.Children(2).String = 'Disarmed';
+            h.Children(4).String = 'Disarmed';
         end
-        h.Children(2).Value = bArmed;  % Also update the toggle state
+        h.Children(4).Value = bArmed;  % Also update the toggle state
     end
     
     % Flash LED
@@ -78,6 +78,7 @@ while 1
         bTripped = 0;
         bLED = 0;
     end
+    clear avgMotion;
   
     % If the alarm is tripped, be annoying as possible
     if (bTripped)
